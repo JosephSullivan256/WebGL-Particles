@@ -42,7 +42,7 @@ export function ParticlesModel(){
 
 					weight += (a2/k)*(PI/2.0 + fx);
 				}
-				gl_FragColor = vec4(weight*vec3(0.9,0.1,0.1),1.0);
+				gl_FragColor = vec4(clamp(weight*vec3(0.9,0.1,0.1),vec3(0.,0.,0.),vec3(1.,1.,1.)),1.0);
 			}
 		`
 	};

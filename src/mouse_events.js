@@ -44,6 +44,7 @@ export function addEventsToElement(ele){
 	});
 
 	window.addEventListener('wheel', evt => {
+		evt.preventDefault();
 		mouseInfo.scrolldelta = evt.deltaY*0.01;
 	});
     
