@@ -1,0 +1,36 @@
+{
+  "name": "webgl-particles",
+  "version": "1.0.0",
+  "description": "",
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "es2015"
+          ]
+        }
+      ]
+    ],
+    "sourceType": "module"
+  },
+  "scripts": {
+    "start": "node start.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify src/main.js -o bundle.js",
+    "watch": "watchify src/main.js -o bundle.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browserify": "^16.5.1",
+    "gl-matrix": "^3.3.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^8.0.0",
+    "watchify": "^3.11.1"
+  }
+}
