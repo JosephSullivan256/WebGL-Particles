@@ -23,10 +23,11 @@ export function ParticlesModel(){
 			uniform float uTime;
 			uniform mat4 transform;
 			uniform vec3 particles[20];
+			uniform float aspect;
 
 			#define PI 3.1415926535897932384626433832795
 			void main() {
-				vec3 dir = normalize(vec3(pos,-1.0));
+				vec3 dir = normalize(vec3(pos.x*aspect,pos.y,-1.0));
 
 				// constants
 				float a = 0.3;
@@ -63,6 +64,7 @@ export function ParticlesModel(){
 				transform: gl.getUniformLocation(shaderProgram,'transform'),
 				particles: gl.getUniformLocation(shaderProgram,'particles'),
 				time: gl.getUniformLocation(shaderProgram,"uTime"),
+				aspect: gl.getUniformLocation(shaderProgram,"aspect"),
 			},
 		}
 
@@ -198,5 +200,8 @@ export function ParticlesModel(){
 			const vertexCount = 6;
 			gl.drawElements(gl.TRIANGLES, vertexCount, type, offset);
 		}
+		gl.uniform1f(
+			this.programInfo.uniformLocations.aspect,
+			globalUniforms.aspect);
 	}
 }

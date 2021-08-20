@@ -87,7 +87,7 @@ function GlobalUniforms(gl){
 	// and 100 units away from the camera.
 
 	const fieldOfView = 45 * Math.PI / 180;   // in radians
-	const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
+	this.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 	const zNear = 0.1;
 	const zFar = 100.0;
 	this.projectionMatrix = mat4.create();
@@ -96,7 +96,7 @@ function GlobalUniforms(gl){
 	// as the destination to receive the result.
 	mat4.perspective(this.projectionMatrix,
 		fieldOfView,
-		aspect,
+		this.aspect,
 		zNear,
 		zFar);
 
