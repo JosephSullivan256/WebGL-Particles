@@ -8265,6 +8265,7 @@ function addEventsToElement(ele) {
 	});
 
 	window.addEventListener('wheel', function (evt) {
+		evt.preventDefault();
 		mouseInfo.scrolldelta = evt.deltaY * 0.01;
 	});
 
@@ -8290,7 +8291,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function ParticlesModel() {
 	var src = {
 		vs: "\n\t\t\tprecision highp float;\n\n\t\t\tattribute vec2 aVertexPosition;\n\n\t\t\tvarying vec2 pos;\n\t\t\t\n\t\t\tvoid main() {\n\t\t\t\tpos = aVertexPosition;\n\t\t\t\tgl_Position = vec4(aVertexPosition,0.0,1.0);\n\t\t\t}\n\t\t",
-		fs: "\n\t\t\tprecision mediump float; //sets medium precision (should be supported on pretty much all mobile)\n\t\t\t\n\t\t\tvarying vec2 pos;\n\n\t\t\tuniform float uTime;\n\t\t\tuniform mat4 transform;\n\t\t\tuniform vec3 particles[20];\n\n\t\t\t#define PI 3.1415926535897932384626433832795\n\t\t\tvoid main() {\n\t\t\t\tvec3 dir = normalize(vec3(pos,-1.0));\n\n\t\t\t\t// constants\n\t\t\t\tfloat a = 0.3;\n\t\t\t\tfloat a2 = dot(a,a);\n\n\t\t\t\tfloat weight = 0.0;\n\t\t\t\tfor(int i = 0; i < 20; i++) {\n\t\t\t\t\tvec3 p = (transform*vec4(particles[i],1.0)).xyz;\n\t\t\t\t\tfloat p2 = dot(p,p);\n\t\t\t\t\tfloat dp = dot(dir,p);\n\t\t\t\t\tfloat k = sqrt((p2+a2)-(dp*dp));\n\t\t\t\t\tfloat fx = atan(dp/(k*k));\n\n\t\t\t\t\tweight += (a2/k)*(PI/2.0 + fx);\n\t\t\t\t}\n\t\t\t\tgl_FragColor = vec4(weight*vec3(0.9,0.1,0.1),1.0);\n\t\t\t}\n\t\t"
+		fs: "\n\t\t\tprecision mediump float; //sets medium precision (should be supported on pretty much all mobile)\n\t\t\t\n\t\t\tvarying vec2 pos;\n\n\t\t\tuniform float uTime;\n\t\t\tuniform mat4 transform;\n\t\t\tuniform vec3 particles[20];\n\n\t\t\t#define PI 3.1415926535897932384626433832795\n\t\t\tvoid main() {\n\t\t\t\tvec3 dir = normalize(vec3(pos,-1.0));\n\n\t\t\t\t// constants\n\t\t\t\tfloat a = 0.3;\n\t\t\t\tfloat a2 = dot(a,a);\n\n\t\t\t\tfloat weight = 0.0;\n\t\t\t\tfor(int i = 0; i < 20; i++) {\n\t\t\t\t\tvec3 p = (transform*vec4(particles[i],1.0)).xyz;\n\t\t\t\t\tfloat p2 = dot(p,p);\n\t\t\t\t\tfloat dp = dot(dir,p);\n\t\t\t\t\tfloat k = sqrt((p2+a2)-(dp*dp));\n\t\t\t\t\tfloat fx = atan(dp/(k*k));\n\n\t\t\t\t\tweight += (a2/k)*(PI/2.0 + fx);\n\t\t\t\t}\n\t\t\t\tgl_FragColor = vec4(clamp(weight*vec3(0.9,0.1,0.1),vec3(0.,0.,0.),vec3(1.,1.,1.)),1.0);\n\t\t\t}\n\t\t"
 	};
 
 	this.programInfo;
