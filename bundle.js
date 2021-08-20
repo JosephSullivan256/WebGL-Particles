@@ -8291,7 +8291,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function ParticlesModel() {
 	var src = {
 		vs: "\n\t\t\tprecision highp float;\n\n\t\t\tattribute vec2 aVertexPosition;\n\n\t\t\tvarying vec2 pos;\n\t\t\t\n\t\t\tvoid main() {\n\t\t\t\tpos = aVertexPosition;\n\t\t\t\tgl_Position = vec4(aVertexPosition,0.0,1.0);\n\t\t\t}\n\t\t",
-		fs: "\n\t\t\tprecision mediump float; //sets medium precision (should be supported on pretty much all mobile)\n\t\t\t\n\t\t\tvarying vec2 pos;\n\n\t\t\tuniform float uTime;\n\t\t\tuniform mat4 transform;\n\t\t\tuniform vec3 particles[20];\n\t\t\tuniform float aspect;\n\n\t\t\t#define PI 3.1415926535897932384626433832795\n\t\t\tvoid main() {\n\t\t\t\tvec3 dir = normalize(vec3(pos.x*aspect,pos.y,-1.0));\n\n\t\t\t\t// constants\n\t\t\t\tfloat a = 0.3;\n\t\t\t\tfloat a2 = dot(a,a);\n\n\t\t\t\tfloat weight = 0.0;\n\t\t\t\tfor(int i = 0; i < 20; i++) {\n\t\t\t\t\tvec3 p = (transform*vec4(particles[i],1.0)).xyz;\n\t\t\t\t\tfloat p2 = dot(p,p);\n\t\t\t\t\tfloat dp = dot(dir,p);\n\t\t\t\t\tfloat k = sqrt((p2+a2)-(dp*dp));\n\t\t\t\t\tfloat fx = atan(dp/(k*k));\n\n\t\t\t\t\tweight += (a2/k)*(PI/2.0 + fx);\n\t\t\t\t}\n\t\t\t\tgl_FragColor = vec4(clamp(weight*vec3(0.9,0.1,0.1),vec3(0.,0.,0.),vec3(1.,1.,1.)),1.0);\n\t\t\t}\n\t\t"
+		fs: "\n\t\t\tprecision mediump float; //sets medium precision (should be supported on pretty much all mobile)\n\t\t\t\n\t\t\tvarying vec2 pos;\n\n\t\t\tuniform float uTime;\n\t\t\tuniform mat4 transform;\n\t\t\tuniform vec3 particles[20];\n\t\t\tuniform float aspect;\n\n\t\t\t#define PI 3.1415926535897932384626433832795\n\t\t\tvoid main() {\n\t\t\t\tvec3 dir = normalize(vec3(pos.x*aspect,pos.y,-1.0));\n\n\t\t\t\t// constants\n\t\t\t\tfloat a = 0.25;\n\t\t\t\tfloat a2 = dot(a,a);\n\n\t\t\t\tfloat weight = 0.0;\n\t\t\t\tfor(int i = 0; i < 20; i++) {\n\t\t\t\t\tvec3 p = (transform*vec4(particles[i],1.0)).xyz;\n\t\t\t\t\tfloat p2 = dot(p,p);\n\t\t\t\t\tfloat dp = dot(dir,p);\n\t\t\t\t\tfloat k = sqrt((p2+a2)-(dp*dp));\n\t\t\t\t\tfloat fx = atan(dp/(k*k));\n\n\t\t\t\t\tweight += (a2/k)*(PI/2.0 + fx);\n\t\t\t\t}\n\t\t\t\tgl_FragColor = vec4(clamp(weight*vec3(0.9,0.1,0.1),vec3(0.,0.,0.),vec3(1.,1.,1.)),1.0);\n\t\t\t}\n\t\t"
 	};
 
 	this.programInfo;
@@ -8327,7 +8327,7 @@ function ParticlesModel() {
 			indices: indexBuffer
 		};
 
-		this.initParticles(20, 30.0);
+		this.initParticles(20, 6.0);
 	};
 
 	this.initParticles = function (n, r) {
@@ -8337,8 +8337,8 @@ function ParticlesModel() {
 		this.forces = new Array(n);
 
 		for (var i = 0; i < n; i++) {
-			var pos = _glMatrix.vec3.create(r);
-			_glMatrix.vec3.random(pos);
+			var pos = _glMatrix.vec3.create();
+			_glMatrix.vec3.random(pos, r);
 			this.positions[i * 3 + 0] = pos[0];
 			this.positions[i * 3 + 1] = pos[1];
 			this.positions[i * 3 + 2] = pos[2];
@@ -8361,8 +8361,8 @@ function ParticlesModel() {
 				_glMatrix.vec3.subtract(ab, b, a);
 
 				var r = _glMatrix.vec3.length(ab);
-				var mag1 = 1.2 / (r * r * r);
-				var mag2 = -0.1 / (r * r * r * r * r);
+				var mag1 = 20 / (r * r * r);
+				var mag2 = -16 / (r * r * r * r);
 				var mag = mag1 + mag2;
 
 				_glMatrix.vec3.scale(this.forces[i], ab, mag);
@@ -8375,11 +8375,18 @@ function ParticlesModel() {
 			var dx = _glMatrix.vec3.create();
 			var dv = _glMatrix.vec3.create();
 
+			_glMatrix.vec3.scaleAndAdd(dx, dx, this.velocities[_i], dt / 2.0);
+
 			_glMatrix.vec3.scale(dv, this.forces[_i], dt);
 			_glMatrix.vec3.add(this.velocities[_i], this.velocities[_i], dv);
 			_glMatrix.vec3.zero(this.forces[_i]);
 
-			_glMatrix.vec3.scale(dx, this.velocities[_i], dt);
+			// half the new velocity added 
+			_glMatrix.vec3.scaleAndAdd(dx, dx, this.velocities[_i], dt / 2.0);
+
+			// "friction"
+			_glMatrix.vec3.scale(this.velocities[_i], this.velocities[_i], 0.99);
+
 			this.positions[3 * _i + 0] += dx[0];
 			this.positions[3 * _i + 1] += dx[1];
 			this.positions[3 * _i + 2] += dx[2];

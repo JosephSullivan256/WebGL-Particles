@@ -30,7 +30,7 @@ export function ParticlesModel(){
 				vec3 dir = normalize(vec3(pos.x*aspect,pos.y,-1.0));
 
 				// constants
-				float a = 0.3;
+				float a = 0.25;
 				float a2 = dot(a,a);
 
 				float weight = 0.0;
@@ -93,7 +93,7 @@ export function ParticlesModel(){
 			indices: indexBuffer,
 		};
 
-		this.initParticles(20,30.0);
+		this.initParticles(20,6.0);
 	}
 
 	this.initParticles = function(n,r){
@@ -103,8 +103,8 @@ export function ParticlesModel(){
 		this.forces = new Array(n);
 
 		for(let i = 0; i < n; i++){
-			let pos = vec3.create(r);
-			vec3.random(pos);
+			let pos = vec3.create();
+			vec3.random(pos, r);
 			this.positions[i*3 + 0] = pos[0];
 			this.positions[i*3 + 1] = pos[1];
 			this.positions[i*3 + 2] = pos[2];
@@ -127,8 +127,8 @@ export function ParticlesModel(){
 				vec3.subtract(ab,b,a);
 
 				let r = vec3.length(ab);
-				let mag1 = 1.2/(r*r*r);
-				let mag2 = -0.1/(r*r*r*r*r);
+				let mag1 = 20/(r*r*r);
+				let mag2 = -16/(r*r*r*r);
 				let mag = mag1+mag2;
 
 				vec3.scale(this.forces[i], ab, mag);
@@ -141,11 +141,18 @@ export function ParticlesModel(){
 			let dx = vec3.create();
 			let dv = vec3.create();
 
+			vec3.scaleAndAdd(dx, dx, this.velocities[i], dt/2.0);
+
 			vec3.scale(dv,this.forces[i],dt);
 			vec3.add(this.velocities[i],this.velocities[i],dv);
 			vec3.zero(this.forces[i]);
 			
-			vec3.scale(dx,this.velocities[i],dt);
+			// half the new velocity added 
+			vec3.scaleAndAdd(dx, dx, this.velocities[i], dt/2.0);
+
+			// "friction"
+			vec3.scale(this.velocities[i],this.velocities[i],0.99);
+			
 			this.positions[3*i+0] += dx[0];
 			this.positions[3*i+1] += dx[1];
 			this.positions[3*i+2] += dx[2];
