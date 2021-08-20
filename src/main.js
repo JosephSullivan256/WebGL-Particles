@@ -79,26 +79,7 @@ function Scene(globalUniforms,models=[]){
 }
 
 function GlobalUniforms(gl){
-	// Create a perspective matrix, a special matrix that is
-	// used to simulate the distortion of perspective in a camera.
-	// Our field of view is 45 degrees, with a width/height
-	// ratio that matches the display size of the canvas
-	// and we only want to see objects between 0.1 units
-	// and 100 units away from the camera.
-
-	const fieldOfView = 45 * Math.PI / 180;   // in radians
 	this.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-	const zNear = 0.1;
-	const zFar = 100.0;
-	this.projectionMatrix = mat4.create();
-
-	// note: glmatrix.js always has the first argument
-	// as the destination to receive the result.
-	mat4.perspective(this.projectionMatrix,
-		fieldOfView,
-		this.aspect,
-		zNear,
-		zFar);
 
 	this.camera = new camera.OrbitingCamera([0.0,0.0,-10.0],[0.0,0.0,0.0]);
 }

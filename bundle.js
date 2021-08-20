@@ -8174,22 +8174,7 @@ function Scene(globalUniforms) {
 }
 
 function GlobalUniforms(gl) {
-	// Create a perspective matrix, a special matrix that is
-	// used to simulate the distortion of perspective in a camera.
-	// Our field of view is 45 degrees, with a width/height
-	// ratio that matches the display size of the canvas
-	// and we only want to see objects between 0.1 units
-	// and 100 units away from the camera.
-
-	var fieldOfView = 45 * Math.PI / 180; // in radians
 	this.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-	var zNear = 0.1;
-	var zFar = 100.0;
-	this.projectionMatrix = _glMatrix.mat4.create();
-
-	// note: glmatrix.js always has the first argument
-	// as the destination to receive the result.
-	_glMatrix.mat4.perspective(this.projectionMatrix, fieldOfView, this.aspect, zNear, zFar);
 
 	this.camera = new camera.OrbitingCamera([0.0, 0.0, -10.0], [0.0, 0.0, 0.0]);
 }
@@ -8327,7 +8312,7 @@ function ParticlesModel() {
 			indices: indexBuffer
 		};
 
-		this.initParticles(20, 6.0);
+		this.initParticles(40, 7.0);
 	};
 
 	this.initParticles = function (n, r) {
@@ -8361,12 +8346,12 @@ function ParticlesModel() {
 				_glMatrix.vec3.subtract(ab, b, a);
 
 				var r = _glMatrix.vec3.length(ab);
-				var mag1 = 20 / (r * r * r);
+				var mag1 = 16 / (r * r * r);
 				var mag2 = -16 / (r * r * r * r);
 				var mag = mag1 + mag2;
 
-				_glMatrix.vec3.scale(this.forces[i], ab, mag);
-				_glMatrix.vec3.scale(this.forces[j], ab, -mag);
+				_glMatrix.vec3.scaleAndAdd(this.forces[i], this.forces[i], ab, mag);
+				_glMatrix.vec3.scaleAndAdd(this.forces[j], this.forces[j], ab, -mag);
 			}
 		}
 
@@ -8385,7 +8370,7 @@ function ParticlesModel() {
 			_glMatrix.vec3.scaleAndAdd(dx, dx, this.velocities[_i], dt / 2.0);
 
 			// "friction"
-			_glMatrix.vec3.scale(this.velocities[_i], this.velocities[_i], 0.99);
+			_glMatrix.vec3.scale(this.velocities[_i], this.velocities[_i], 0.995);
 
 			this.positions[3 * _i + 0] += dx[0];
 			this.positions[3 * _i + 1] += dx[1];

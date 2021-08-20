@@ -93,7 +93,7 @@ export function ParticlesModel(){
 			indices: indexBuffer,
 		};
 
-		this.initParticles(20,6.0);
+		this.initParticles(40,7.0);
 	}
 
 	this.initParticles = function(n,r){
@@ -127,12 +127,12 @@ export function ParticlesModel(){
 				vec3.subtract(ab,b,a);
 
 				let r = vec3.length(ab);
-				let mag1 = 20/(r*r*r);
+				let mag1 = 16/(r*r*r);
 				let mag2 = -16/(r*r*r*r);
 				let mag = mag1+mag2;
 
-				vec3.scale(this.forces[i], ab, mag);
-				vec3.scale(this.forces[j], ab, -mag);
+				vec3.scaleAndAdd(this.forces[i], this.forces[i], ab, mag);
+				vec3.scaleAndAdd(this.forces[j], this.forces[j], ab, -mag);
 			}
 		}
 
@@ -151,7 +151,7 @@ export function ParticlesModel(){
 			vec3.scaleAndAdd(dx, dx, this.velocities[i], dt/2.0);
 
 			// "friction"
-			vec3.scale(this.velocities[i],this.velocities[i],0.99);
+			vec3.scale(this.velocities[i],this.velocities[i],0.995);
 			
 			this.positions[3*i+0] += dx[0];
 			this.positions[3*i+1] += dx[1];
